@@ -283,15 +283,17 @@ function runCardShuffleDeal() {
   });
 
   document.documentElement.style.setProperty('--wheel-radius', `${orbitRadius}px`);
-  // 0.0–1.2: physical stack, 1.2–4.4: controlled shuffle,
-  // 4.4–5.3: gather, 5.3–6.7: form orbit, 6.7–7.0: settle.
+  // 0.0–1.2: physical stack, 1.2–2.65: cards flow out,
+  // 2.65–4.4: controlled shuffle, 4.4–5.3: gather,
+  // 5.3–6.7: form round banner, 6.7–7.0: settle.
   const stage = (fn, delay) => setTimeout(() => {
     if (sequenceRun === cardSequenceRun && document.body.contains(flight)) fn();
   }, delay);
   requestAnimationFrame(() => {
     if (sequenceRun === cardSequenceRun) flight.classList.add('cards-stack-ready');
   });
-  stage(() => { flight.classList.remove('cards-stack'); flight.classList.add('cards-shuffling'); }, 1200);
+  stage(() => { flight.classList.remove('cards-stack'); flight.classList.add('cards-flowing'); }, 1200);
+  stage(() => { flight.classList.remove('cards-flowing'); flight.classList.add('cards-shuffling'); }, 2650);
   stage(() => { flight.classList.remove('cards-shuffling'); flight.classList.add('cards-gathering'); }, 4400);
   stage(() => { flight.classList.remove('cards-gathering'); flight.classList.add('cards-organizing'); }, 5300);
   stage(() => { flight.classList.remove('cards-organizing'); flight.classList.add('cards-settling'); }, 6700);
