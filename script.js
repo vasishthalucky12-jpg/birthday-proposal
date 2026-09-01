@@ -10,9 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initMusicToggle();
   initHeartBurstOnClick();
   initFireworks();
+  initFloatingPetals();
   initMultiStepQuiz();
   initPostQuizSurprise();
   initLoveLetterModal();
+  initAutoMusicOnInteraction();
 });
 
 let cardSequenceRun = 0;
@@ -36,6 +38,7 @@ function initGiftBoxSurprise() {
     openingTimers = [];
     document.getElementById('memoryFlight')?.remove();
     document.getElementById('rouletteGlass')?.remove();
+    stopCylinderAnimation();
   };
   const delay = (fn, ms) => openingTimers.push(setTimeout(fn, ms));
 
@@ -89,132 +92,23 @@ function initGiftBoxSurprise() {
   replayBtn?.addEventListener('click', beginOpening);
 }
 
-/* SCENE 3: PLAYING CARD SHUFFLE DEAL ANIMATION & 7-PHASE TRANSFORMATION PIPELINE */
-function runLegacyCardShuffleDeal() {
-  const photoPaths = [
-    'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.09 PM.jpeg',
-    'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.10 PM.jpeg',
-    'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.24 PM.jpeg',
-    'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.25 PM.jpeg',
-    'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.26 PM (1).jpeg',
-    'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.26 PM.jpeg',
-    'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.27 PM (1).jpeg',
-    'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.27 PM.jpeg',
-    'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.29 PM.jpeg',
-    'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.31 PM.jpeg',
-    'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.32 PM.jpeg'
-  ].map((src, index) => ({ src, title: `Memory ${index + 1}` }));
-  if (!photoPaths.length) return;
-
-  document.getElementById('memoryFlight')?.remove();
-  document.getElementById('rouletteGlass')?.remove();
-
-  const flight = document.createElement('div');
-  flight.id = 'memoryFlight';
-  flight.className = 'memory-flight';
-  document.body.appendChild(flight);
-
-  const totalPhotos = photoPaths.length;
-  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.39 : 0.275);
-
-  photoPaths.forEach((item, index) => {
-    const card = document.createElement('figure');
-    // Calculate precise target angle around 3D cylindrical track
-    const angleRad = ((index / totalPhotos) * 2 * Math.PI) + (Math.PI / totalPhotos);
-    const angleDeg = (360 / totalPhotos) * index + (180 / totalPhotos);
-
-    card.className = 'flying-photo';
-    card.style.setProperty('--photo-index', index);
-    
-    // Initial entrance coordinates from bottom
-    const startX = Math.round((index / Math.max(totalPhotos - 1, 1) - 0.5) * 88 + (Math.random() - 0.5) * 14);
-    card.style.setProperty('--start-x', `${startX}vw`);
-    card.style.setProperty('--rise-x', `${Math.round(startX + (Math.random() - 0.5) * 18)}vw`);
-    card.style.setProperty('--rise-y', `${Math.round(-12 - Math.random() * 28)}vh`);
-
-    // Phase 1 Roaming coordinates
-    const flyX = Math.round((Math.random() - 0.5) * 92);
-    const flyY = Math.round(-10 - Math.random() * 78);
-    const turn = Math.round((Math.random() - 0.5) * 34);
-    const scale = (0.68 + Math.random() * 0.42).toFixed(2);
-
-    card.style.setProperty('--fly-x', `${flyX}vw`);
-    card.style.setProperty('--fly-y', `${flyY}vh`);
-    card.style.setProperty('--turn', `${turn}deg`);
-    card.style.setProperty('--scale', scale);
-    card.style.setProperty('--delay', `${index * 220}ms`);
-
-    // Phase 3 Curved Arc trajectory coordinates (Curving around center toward orbit slot)
-    const curveX = Math.round(flyX * 0.4 + Math.cos(angleRad) * 24);
-    const curveY = Math.round(flyY * 0.4 + Math.sin(angleRad) * 20);
-    const curveTurn = Math.round(turn * 0.4 + (index % 2 === 0 ? 12 : -12));
-    card.style.setProperty('--curve-x', `${curveX}vw`);
-    card.style.setProperty('--curve-y', `${curveY}vh`);
-    card.style.setProperty('--curve-turn', `${curveTurn}deg`);
-
-    // Phase 4 & 5 3D Orbit variables
-    card.style.setProperty('--orbit-angle', `${angleDeg}deg`);
-    card.style.setProperty('--orbit-radius', `${orbitRadius}px`);
-    card.style.setProperty('--ring-x', `${Math.cos(angleRad) * orbitRadius}px`);
-    card.style.setProperty('--ring-y', `${Math.sin(angleRad) * orbitRadius}px`);
-    card.style.setProperty('--ring-turn', `${Math.round(Math.sin(angleRad) * 8)}deg`);
-    card.style.setProperty('--ring-scale', (0.9 + ((Math.cos(angleRad) + 1) * 0.06)).toFixed(3));
-    card.style.setProperty('--organize-radius', `${orbitRadius * 0.78}px`);
-    card.style.setProperty('--depth-delay', `-${((1 - angleDeg / 360) * 38).toFixed(2)}s`);
-
-    card.innerHTML = `<img src="${item.src}" alt="${item.title}"><figcaption>${index % 2 ? '✨ A little memory' : '❤️ Our moment'}</figcaption>`;
-    flight.appendChild(card);
-  });
-
-  document.documentElement.style.setProperty('--wheel-radius', `${orbitRadius}px`);
-
-  // ============================================================
-  // 📸 PHASE 1: PHOTOS ENTERING & ROAMING
-  // ============================================================
-  requestAnimationFrame(() => flight.classList.add('photos-entering'));
-  // 24–29s: photos rise from the bottom edge before they begin roaming.
-  setTimeout(() => flight.classList.add('photos-roaming'), 5000);
-
-  // ============================================================
-  // 🐢 PHASE 2: SLOW DOWN (0s – 1.5s of assembly)
-  // ============================================================
-  // 29–35s: the whole viewport remains filled with drifting memories.
-  setTimeout(() => {
-    flight.classList.remove('photos-roaming');
-    flight.classList.add('photos-slowing');
-  }, 11000);
-
-  // ============================================================
-  // 🌀 PHASE 3: BEGIN CURVED CIRCULAR MOVEMENT (1.5s – 3.0s of assembly)
-  // ============================================================
-  setTimeout(() => {
-    flight.classList.remove('photos-slowing');
-    flight.classList.add('photos-curving');
-  }, 12500);
-
-  // ============================================================
-  // 🎰 PHASE 4 & 5: BUILD ROULETTE & CREATE 3D DEPTH (3.0s – 4.5s of assembly)
-  // ============================================================
-  setTimeout(() => {
-    flight.classList.remove('photos-curving');
-    flight.classList.add('photos-building');
-    prepareRouletteTrack();
-  }, 14000);
-
-  // ============================================================
-  // 🪟 PHASE 6: GLASSMORPHISM EMERGES AROUND THE PHOTOS (4.0s – 5.5s of assembly)
-  // ============================================================
-  setTimeout(() => {
-    buildGlassmorphismAroundPhotos();
-  }, 15400);
-
-  // ============================================================
-  // 🔮 PHASE 7: FINAL GLASS ROULETTE & CONTINUOUS ROTATION (5.5s – 7.0s)
-  // ============================================================
-  setTimeout(transitionToMemoryOrbit, 16200);
+/* SCENE 3: ONE CONTINUOUS 7-SECOND PHOTO STACK → SHUFFLE → 3D CYLINDRICAL CAROUSEL */
+function calculateCylinderRadius() {
+  const w = window.innerWidth;
+  let cardWidth;
+  if (w <= 480) {
+    cardWidth = Math.max(90, Math.min(w * 0.23, 110));
+  } else if (w <= 768) {
+    cardWidth = Math.max(115, Math.min(w * 0.17, 140));
+  } else {
+    cardWidth = Math.max(135, Math.min(w * 0.12, 168));
+  }
+  const total = 11;
+  const gap = w <= 480 ? 14 : 24;
+  const radius = Math.round((cardWidth + gap) / (2 * Math.tan(Math.PI / total)));
+  return Math.max(w <= 480 ? 195 : 290, radius);
 }
 
-/* SCENE 3: ONE CONTINUOUS 7-SECOND PHOTO STACK → SHUFFLE → ROULETTE */
 function runCardShuffleDeal() {
   const photoPaths = [
     'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.09 PM.jpeg',
@@ -232,7 +126,7 @@ function runCardShuffleDeal() {
   const flight = document.createElement('div');
   const sequenceRun = ++cardSequenceRun;
   const totalPhotos = photoPaths.length;
-  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.39 : 0.275);
+  const orbitRadius = calculateCylinderRadius();
   const stackX = [-18, 14, -10, 21, -23, 8, 18, -15, 4, 24, -6];
   const stackY = [8, -4, 13, 2, -10, 16, -13, 5, -16, 11, -1];
   const stackTurn = [-9, 6, -5, 11, -12, 4, 9, -7, 2, 13, -3];
@@ -240,7 +134,7 @@ function runCardShuffleDeal() {
   const shuffleB = [105, 146, 70, -35, -132, -175, -92, -14, 67, 151, 20];
 
   document.getElementById('memoryFlight')?.remove();
-  document.getElementById('rouletteGlass')?.remove();
+  stopCylinderAnimation();
   flight.id = 'memoryFlight';
   flight.className = 'memory-flight cards-stack';
   document.body.appendChild(flight);
@@ -255,8 +149,8 @@ function runCardShuffleDeal() {
 
   photoPaths.forEach((src, index) => {
     const card = document.createElement('figure');
-    const angleDeg = (360 / totalPhotos) * index + (180 / totalPhotos);
-    const angleRad = (angleDeg * Math.PI) / 180;
+    // Compute 3D cylinder angle for each photo
+    const angleDeg = (360 / totalPhotos) * index;
     card.className = 'flying-photo';
     card.style.setProperty('--photo-index', index);
     card.style.setProperty('--stack-x', `${stackX[index]}px`);
@@ -273,19 +167,12 @@ function runCardShuffleDeal() {
     card.style.setProperty('--shuffle-delay', `${index * 42}ms`);
     card.style.setProperty('--orbit-angle', `${angleDeg}deg`);
     card.style.setProperty('--orbit-radius', `${orbitRadius}px`);
-    card.style.setProperty('--ring-x', `${Math.cos(angleRad) * orbitRadius}px`);
-    card.style.setProperty('--ring-y', `${Math.sin(angleRad) * orbitRadius}px`);
-    card.style.setProperty('--ring-turn', `${Math.round(Math.sin(angleRad) * 8)}deg`);
-    card.style.setProperty('--ring-scale', (0.9 + ((Math.cos(angleRad) + 1) * 0.06)).toFixed(3));
-    card.style.setProperty('--depth-delay', `-${((1 - angleDeg / 360) * 38).toFixed(2)}s`);
     card.innerHTML = `<img src="${src}" alt="Memory ${index + 1}"><figcaption>${index % 2 ? '✨ A little memory' : '❤️ Our moment'}</figcaption>`;
     track.appendChild(card);
   });
 
   document.documentElement.style.setProperty('--wheel-radius', `${orbitRadius}px`);
-  // 0.0–1.2: physical stack, 1.2–2.65: cards flow out,
-  // 2.65–4.4: controlled shuffle, 4.4–5.3: gather,
-  // 5.3–6.7: form round banner, 6.7–7.0: settle.
+
   const stage = (fn, delay) => setTimeout(() => {
     if (sequenceRun === cardSequenceRun && document.body.contains(flight)) fn();
   }, delay);
@@ -300,42 +187,14 @@ function runCardShuffleDeal() {
   stage(transitionToMemoryOrbit, 7000);
 }
 
-function prepareRouletteTrack() {
-  const flight = document.getElementById('memoryFlight');
-  if (!flight || document.getElementById('rouletteTrack')) return;
-  const position = document.createElement('div');
-  position.className = 'roulette-position';
-  const track = document.createElement('div');
-  track.id = 'rouletteTrack';
-  track.className = 'roulette-track';
-  position.appendChild(track);
-  flight.appendChild(position);
-  [...flight.querySelectorAll(':scope > .flying-photo')].forEach((card) => track.appendChild(card));
-}
+/* 🔮 PHASE 7: 3D CYLINDRICAL CAROUSEL ROTATION ENGINE & DRAG CONTROL */
+let cylinderAnimationId = null;
+let cylinderRotation = 0;
+let isDraggingCylinder = false;
+let dragStartX = 0;
+let dragStartAngle = 0;
+let dragInitialized = false;
 
-/* 🪟 PHASE 6: GLASSMORPHISM EMERGES IN STEPS AROUND MOVING PHOTOS */
-function buildGlassmorphismAroundPhotos() {
-  if (document.getElementById('rouletteGlass')) return;
-
-  const glassShell = document.createElement('div');
-  glassShell.id = 'rouletteGlass';
-  glassShell.className = 'glass-roulette-shell';
-  glassShell.innerHTML = '<span class="glass-rim glass-rim-top"></span><span class="glass-rim glass-rim-bottom"></span><span class="glass-reflection"></span>';
-  document.body.appendChild(glassShell);
-
-  // Step 1: Subtle transparent glow appears
-  requestAnimationFrame(() => glassShell.classList.add('glass-glow'));
-  // Step 2: Thin glass rims draw around top & bottom
-  setTimeout(() => glassShell.classList.add('glass-rims'), 350);
-  // Step 3: Glass surface materializes with backdrop blur
-  setTimeout(() => glassShell.classList.add('glass-surface'), 700);
-  // Step 4: Reflection sweep across glass
-  setTimeout(() => glassShell.classList.add('glass-sweep'), 1050);
-  // Step 5 & 6: Glass becomes fully formed while remaining transparent
-  setTimeout(() => glassShell.classList.add('glass-ready'), 1400);
-}
-
-/* 🔮 PHASE 7: STABILIZE ROULETTE & BEGIN CONTINUOUS ROTATION */
 function transitionToMemoryOrbit() {
   const flight = document.getElementById('memoryFlight');
   const track = document.getElementById('rouletteTrack');
@@ -348,93 +207,96 @@ function transitionToMemoryOrbit() {
 
   glassStage?.classList.remove('hidden');
   setTimeout(() => sceneMessage?.classList.remove('hidden'), 1200);
+
+  startCylinderAnimation();
 }
 
-/* SCENE 4: 3D GLASSMORPHISM ROUND PHOTO BANNER */
-let bannerAngle = 0;
-let bannerInterval = null;
+function startCylinderAnimation() {
+  stopCylinderAnimation();
 
-function transitionToGlassBanner() {
-  const cardDeck = document.getElementById('cardDeckContainer');
-  const glassStage = document.getElementById('glassBannerStage');
-  const glassCarousel = document.getElementById('glassBannerCarousel');
-  const sceneMessage = document.getElementById('birthdayMessageScene');
+  const track = document.getElementById('rouletteTrack');
+  if (!track) return;
 
-  if (cardDeck) cardDeck.style.display = 'none';
-  if (glassStage) glassStage.classList.remove('hidden');
+  function loop() {
+    if (!isDraggingCylinder) {
+      // Smooth continuous 3D rotation around Y axis (approx 0.22 deg per frame)
+      cylinderRotation = (cylinderRotation + 0.22) % 360;
+      track.style.transform = `rotateY(${cylinderRotation}deg)`;
+    }
+    cylinderAnimationId = requestAnimationFrame(loop);
+  }
 
-  // Populate 11 photos into 3D Glass Carousel ring
-  const photoPaths = [
-    { src: 'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.09 PM.jpeg', title: 'Cherished Moment 1 ♥' },
-    { src: 'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.10 PM.jpeg', title: 'Pure Joy 2 🌟' },
-    { src: 'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.24 PM.jpeg', title: 'Sweetest Smile 3 ❤️' },
-    { src: 'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.25 PM.jpeg', title: 'Forever Us 4 ♾️' },
-    { src: 'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.26 PM (1).jpeg', title: 'Precious Memories 5 ✨' },
-    { src: 'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.26 PM.jpeg', title: 'My Lifeline 6 🫂' },
-    { src: 'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.27 PM (1).jpeg', title: 'Heartbeats 7 💖' },
-    { src: 'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.27 PM.jpeg', title: 'Beautiful Days 8 🌸' },
-    { src: 'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.29 PM.jpeg', title: 'Endless Love 9 💘' },
-    { src: 'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.31 PM.jpeg', title: 'Together Always 10 ♾️' },
-    { src: 'PHOTOS/WhatsApp Image 2026-08-29 at 12.04.32 PM.jpeg', title: 'Happy Birthday My Love 🎂' }
-  ];
+  cylinderAnimationId = requestAnimationFrame(loop);
+  initCylinderDrag();
+}
 
-  glassCarousel.innerHTML = '';
-  const total = photoPaths.length;
-  const cardWidth = 168; // 70% of 240px
-  const radius = Math.round((cardWidth / 2) / Math.tan(Math.PI / total)) + 20;
+function stopCylinderAnimation() {
+  if (cylinderAnimationId) {
+    cancelAnimationFrame(cylinderAnimationId);
+    cylinderAnimationId = null;
+  }
+}
 
-  photoPaths.forEach((item, i) => {
-    const node = document.createElement('div');
-    node.className = 'glass-card-node';
-    const angle = (360 / total) * i;
-    node.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
-    node.innerHTML = `
-      <img src="${item.src}" alt="${item.title}">
-      <div class="glass-card-label"><span>${item.title}</span></div>
-    `;
-    glassCarousel.appendChild(node);
+function initCylinderDrag() {
+  if (dragInitialized) return;
+  dragInitialized = true;
+
+  function onPointerDown(e) {
+    // Prevent dragging when interacting with quiz button or other UI buttons
+    if (e.target.closest('#quizStartBannerBtn') || e.target.closest('.banner-quiz-cta') || e.target.closest('.action-pill-btn') || e.target.closest('.theme-btn') || e.target.closest('#musicBtn') || e.target.closest('#quizModal')) {
+      return;
+    }
+    const track = document.getElementById('rouletteTrack');
+    if (!track) return;
+
+    isDraggingCylinder = true;
+    dragStartX = e.clientX;
+    dragStartAngle = cylinderRotation;
+    track.classList.add('dragging');
+  }
+
+  function onPointerMove(e) {
+    if (!isDraggingCylinder) return;
+    const track = document.getElementById('rouletteTrack');
+    if (!track) return;
+
+    const deltaX = e.clientX - dragStartX;
+    // Drag left -> rotates cylinder left, Drag right -> rotates cylinder right
+    cylinderRotation = (dragStartAngle + deltaX * 0.38) % 360;
+    track.style.transform = `rotateY(${cylinderRotation}deg)`;
+  }
+
+  function onPointerUp() {
+    if (!isDraggingCylinder) return;
+    isDraggingCylinder = false;
+    const track = document.getElementById('rouletteTrack');
+    if (track) track.classList.remove('dragging');
+  }
+
+  window.addEventListener('pointerdown', onPointerDown, { passive: true });
+  window.addEventListener('pointermove', onPointerMove, { passive: true });
+  window.addEventListener('pointerup', onPointerUp, { passive: true });
+  window.addEventListener('pointercancel', onPointerUp, { passive: true });
+
+  window.addEventListener('resize', () => {
+    const newRadius = calculateCylinderRadius();
+    document.documentElement.style.setProperty('--wheel-radius', `${newRadius}px`);
+    document.querySelectorAll('.flying-photo').forEach(photo => {
+      photo.style.setProperty('--orbit-radius', `${newRadius}px`);
+    });
   });
-
-  // Auto rotation loop for glass ring
-  if (bannerInterval) clearInterval(bannerInterval);
-  bannerInterval = setInterval(() => {
-    bannerAngle -= 0.6;
-    glassCarousel.style.transform = `rotateY(${bannerAngle}deg)`;
-  }, 30);
-
-  // SCENE 5: Reveal Birthday Message
-  setTimeout(() => {
-    if (sceneMessage) sceneMessage.classList.remove('hidden');
-  }, 1500);
-
-  // Interactive mouse/touch dragging
-  let isDragging = false;
-  let startX = 0;
-  let startAngle = 0;
-
-  glassStage.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    startX = e.clientX;
-    startAngle = bannerAngle;
-  });
-
-  window.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    const delta = e.clientX - startX;
-    bannerAngle = startAngle + (delta * 0.4);
-    glassCarousel.style.transform = `rotateY(${bannerAngle}deg)`;
-  });
-
-  window.addEventListener('mouseup', () => { isDragging = false; });
 }
 
 /* ============================================ */
-/*  THEME ENGINE                                */
+/*  THEME ENGINE — 4 ROMANTIC PALETTES          */
 /* ============================================ */
 
 let currentTheme = 'blush';
 const themePalettes = {
-  blush: [['#ff85a1', '#ffb3c1', '#c9184a'], ['#ff4d6d', '#ff758f', '#fff0f3']]
+  blush:       [['#ff85a1', '#ffb3c1', '#c9184a'], ['#ff4d6d', '#ff758f', '#fff0f3']],
+  velvet:      [['#d90429', '#ffd166', '#ef233c'], ['#9b2226', '#ff4d6d', '#ffba08']],
+  starlight:   [['#c77dff', '#e0aaff', '#7b2cbf'], ['#9d4edd', '#f368e0', '#48cae4']],
+  candlelight: [['#ffb703', '#fcbf49', '#d62828'], ['#f77f00', '#ffd166', '#fb8500']]
 };
 
 function initThemeEngine() {
@@ -447,7 +309,10 @@ function initThemeEngine() {
       btns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
+      // Preserve any extra body classes (opening-cake, opening-celebrate, etc.)
+      const preserveClasses = [...document.body.classList].filter(c => !c.startsWith('theme-'));
       document.body.className = '';
+      preserveClasses.forEach(c => document.body.classList.add(c));
       document.body.classList.add(`theme-${theme}`);
       currentTheme = theme;
 
@@ -461,12 +326,18 @@ function initThemeEngine() {
 /* ============================================ */
 
 const promisesList = [
-  "❤️ Hold your hand through every chapter",
-  "♾️ Grow old with you & celebrate your dreams",
-  "🎂 Make you smile on every single day",
-  "🫂 Endless warm hugs whenever you are tired",
-  "✨ Be your biggest fan in everything you do",
-  "💖 Love you endlessly today, tomorrow & forever"
+  "❤️ Hold your hand through every chapter of our story",
+  "♾️ Grow old with you & celebrate your wildest dreams",
+  "🎂 Make you smile on every single sunrise & sunset",
+  "🫂 Give you endless warm hugs whenever life gets heavy",
+  "✨ Be your biggest fan in everything you do, always",
+  "💖 Love you endlessly today, tomorrow & in every lifetime",
+  "🌹 Surprise you with roses when you least expect it",
+  "💍 Choose you again & again in every universe",
+  "🌙 Whisper 'I love you' under every moonlit sky",
+  "🏡 Build a home full of laughter, love & little us-es",
+  "💌 Write you love letters even when we are 80",
+  "🌅 Watch every sunset with you by my side, forever"
 ];
 
 function initLovePromiseRoulette() {
@@ -1047,7 +918,7 @@ function initMultiStepQuiz() {
 let startPostQuizSurprise = () => {};
 
 /* ============================================================ */
-/*  POST-QUIZ INTERACTIVE SURPRISE                              */
+/*  POST-QUIZ INTERACTIVE SURPRISE — INTERACTION-BASED ARCHERY   */
 /* ============================================================ */
 
 function initPostQuizSurprise() {
@@ -1057,7 +928,6 @@ function initPostQuizSurprise() {
   const tease = document.getElementById('surpriseTease');
   const giftBox = document.getElementById('surpriseGiftBox');
   const bow = document.getElementById('surpriseBow');
-  const bowHint = bow?.querySelector('p');
   const letterBtn = document.getElementById('surpriseLetterBtn');
   const photos = [...document.querySelectorAll('.surprise-photo')];
   if (!sequence || !yesBtn || !noBtn || !giftBox || !bow || !letterBtn) return;
@@ -1065,33 +935,259 @@ function initPostQuizSurprise() {
   let yesEscapes = 0;
   let giftOpened = false;
   let revealedPhotos = 0;
+  let isAnimating = false;
+  let shotInFlight = false;
   let pulling = false;
   let pullStartX = 0;
   let pullAmount = 0;
-  let shotInFlight = false;
+  let activeArrowRAF = null;
+  let surpriseTimers = [];
+
+  const addTimer = (fn, delay) => {
+    const id = setTimeout(fn, delay);
+    surpriseTimers.push(id);
+    return id;
+  };
+
+  const clearAllTimers = () => {
+    surpriseTimers.forEach(id => clearTimeout(id));
+    surpriseTimers = [];
+  };
 
   const setTease = (message) => {
     if (tease) tease.textContent = message;
   };
 
+  function getElementCenter(el) {
+    const rect = el.getBoundingClientRect();
+    return {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    };
+  }
+
+  function drawTrajectoryPath(start, target) {
+    let svg = document.getElementById('trajectorySvg');
+    if (!svg) {
+      svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.id = 'trajectorySvg';
+      svg.setAttribute('class', 'trajectory-svg');
+      svg.innerHTML = `
+        <defs>
+          <linearGradient id="trajectoryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffe699" stop-opacity="0.95" />
+            <stop offset="45%" stop-color="#ff75a0" stop-opacity="0.9" />
+            <stop offset="100%" stop-color="#e8175d" stop-opacity="0.95" />
+          </linearGradient>
+        </defs>
+        <path id="trajectoryPathEl" class="trajectory-path" />
+      `;
+      sequence.appendChild(svg);
+    }
+
+    const pathEl = document.getElementById('trajectoryPathEl');
+    if (!pathEl) return;
+
+    const dx = target.x - start.x;
+    const dy = target.y - start.y;
+    const dist = Math.hypot(dx, dy);
+    const midX = (start.x + target.x) / 2;
+    const midY = (start.y + target.y) / 2;
+    // Ballistic arc curving upwards against gravity
+    const ctrlX = midX;
+    const ctrlY = midY - Math.max(50, dist * 0.22);
+
+    pathEl.setAttribute('d', `M ${start.x} ${start.y} Q ${ctrlX} ${ctrlY} ${target.x} ${target.y}`);
+    pathEl.style.opacity = '0.85';
+  }
+
+  function clearTrajectoryPath() {
+    const pathEl = document.getElementById('trajectoryPathEl');
+    if (pathEl) pathEl.style.opacity = '0';
+  }
+
+  // Aims at the target photo and WAITS for user interaction (NO auto-shooting)
+  function setReadyTarget(photoIndex) {
+    if (photoIndex >= photos.length || !sequence.classList.contains('active')) return;
+    const targetPhoto = photos[photoIndex];
+    if (!targetPhoto) return;
+
+    photos.forEach(p => p.querySelector('.photo-target')?.classList.remove('target-aimed'));
+    const targetMarker = targetPhoto.querySelector('.photo-target');
+    if (targetMarker) targetMarker.classList.add('target-aimed');
+
+    const bowCenter = getElementCenter(bow);
+    const targetCenter = getElementCenter(targetPhoto);
+
+    const angleRad = Math.atan2(targetCenter.y - bowCenter.y, targetCenter.x - bowCenter.x);
+    const angleDeg = angleRad * (180 / Math.PI);
+
+    // Smoothly swivel bow to point directly at the active target
+    bow.style.setProperty('--aim-angle', `${angleDeg}deg`);
+
+    drawTrajectoryPath(bowCenter, targetCenter);
+
+    // Make bow interactively ready for user tap/click
+    bow.classList.add('interactive-ready');
+    isAnimating = false;
+    shotInFlight = false;
+  }
+
+  function spawnArrowTrailParticle(x, y, angleRad) {
+    const symbols = ['❤️', '✨', '💖', '✦', '💕'];
+    const p = document.createElement('span');
+    p.className = 'arrow-trail-particle';
+    p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    const backOffset = 32;
+    const px = x - Math.cos(angleRad) * backOffset + (Math.random() - 0.5) * 14;
+    const py = y - Math.sin(angleRad) * backOffset + (Math.random() - 0.5) * 14;
+    p.style.left = `${px}px`;
+    p.style.top = `${py}px`;
+    p.style.setProperty('--dx', `${(Math.random() - 0.5) * 22}px`);
+    p.style.setProperty('--dy', `${(Math.random() - 0.5) * 22 + 8}px`);
+    p.style.setProperty('--rot', `${(Math.random() - 0.5) * 44}deg`);
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 650);
+  }
+
+  function animateArrowToTarget({ start, target, targetPhoto, onComplete }) {
+    const dx = target.x - start.x;
+    const dy = target.y - start.y;
+    const dist = Math.hypot(dx, dy);
+    const ctrlX = (start.x + target.x) / 2;
+    const ctrlY = (start.y + target.y) / 2 - Math.max(50, dist * 0.22);
+
+    const flyingArrow = document.createElement('div');
+    flyingArrow.className = 'flying-love-arrow';
+    document.body.appendChild(flyingArrow);
+
+    const duration = Math.min(920, Math.max(680, dist * 1.25));
+    const startTime = performance.now();
+    let lastParticleTime = 0;
+
+    function frame(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      const t = progress;
+
+      // Quadratic Bezier interpolation for curved ballistic flight
+      const curX = (1 - t) * (1 - t) * start.x + 2 * (1 - t) * t * ctrlX + t * t * target.x;
+      const curY = (1 - t) * (1 - t) * start.y + 2 * (1 - t) * t * ctrlY + t * t * target.y;
+
+      // Derivative vector for dynamic tangent rotation
+      const derivX = 2 * (1 - t) * (ctrlX - start.x) + 2 * t * (target.x - ctrlX);
+      const derivY = 2 * (1 - t) * (ctrlY - start.y) + 2 * t * (target.y - ctrlY);
+      const angleRad = Math.atan2(derivY, derivX);
+      const angleDeg = angleRad * (180 / Math.PI);
+
+      // Depth scaling from foreground (1.04) to target distance (0.96)
+      const scale = 1.04 - (0.08 * progress);
+
+      flyingArrow.style.left = `${curX}px`;
+      flyingArrow.style.top = `${curY}px`;
+      flyingArrow.style.transform = `translate(-50%, -50%) rotate(${angleDeg}deg) scale(${scale})`;
+
+      if (now - lastParticleTime > 30 && progress < 0.96) {
+        lastParticleTime = now;
+        spawnArrowTrailParticle(curX, curY, angleRad);
+      }
+
+      if (progress < 1) {
+        activeArrowRAF = requestAnimationFrame(frame);
+      } else {
+        flyingArrow.style.transform = `translate(-50%, -50%) rotate(${angleDeg}deg) scale(1.15)`;
+        setTimeout(() => flyingArrow.remove(), 260);
+        onComplete();
+      }
+    }
+
+    activeArrowRAF = requestAnimationFrame(frame);
+  }
+
+  // TRIGGERED ONLY WHEN USER CLICKS OR TAPS THE BOW
+  function handleBowUserShot() {
+    if (isAnimating || shotInFlight || !giftOpened || revealedPhotos >= photos.length) return;
+    isAnimating = true;
+    shotInFlight = true;
+
+    bow.classList.remove('interactive-ready');
+
+    const targetPhoto = photos[revealedPhotos];
+    const bowCenter = getElementCenter(bow);
+    const targetCenter = getElementCenter(targetPhoto);
+
+    // Realistic draw tension
+    bow.classList.add('drawn', 'firing');
+    bow.style.setProperty('--pull-distance', '44px');
+    bow.style.setProperty('--string-pull-distance', '-20px');
+
+    addTimer(() => {
+      bow.classList.remove('drawn');
+      bow.style.removeProperty('--pull-distance');
+      bow.style.removeProperty('--string-pull-distance');
+
+      clearTrajectoryPath();
+
+      animateArrowToTarget({
+        start: bowCenter,
+        target: targetCenter,
+        targetPhoto,
+        onComplete: () => {
+          targetPhoto.classList.add('target-hit', 'revealed');
+          const marker = targetPhoto.querySelector('.photo-target');
+          if (marker) marker.classList.remove('target-aimed');
+
+          spawnHeartBurst(targetCenter.x, targetCenter.y, 24);
+
+          revealedPhotos += 1;
+          bow.classList.remove('firing');
+
+          if (revealedPhotos < photos.length) {
+            // Settle impact, then aim at next photo and WAIT for the user to click again!
+            addTimer(() => {
+              setReadyTarget(revealedPhotos);
+            }, 500);
+          } else {
+            // All 3 photos revealed!
+            isAnimating = false;
+            shotInFlight = false;
+            bow.classList.add('complete');
+            addTimer(() => sequence.classList.add('show-letter'), 720);
+          }
+        }
+      });
+    }, 220);
+  }
+
   const resetSequence = () => {
+    clearAllTimers();
+    if (activeArrowRAF) {
+      cancelAnimationFrame(activeArrowRAF);
+      activeArrowRAF = null;
+    }
+    document.querySelectorAll('.flying-love-arrow, .arrow-trail-particle').forEach(el => el.remove());
+    clearTrajectoryPath();
     yesEscapes = 0;
     giftOpened = false;
     revealedPhotos = 0;
+    isAnimating = false;
+    shotInFlight = false;
     pulling = false;
     pullAmount = 0;
-    shotInFlight = false;
     sequence.className = 'surprise-sequence active show-gate';
     sequence.setAttribute('aria-hidden', 'false');
     yesBtn.style.transform = '';
     noBtn.style.transform = '';
     giftBox.classList.remove('gift-opened');
-    bow.classList.remove('pulling', 'firing', 'complete');
+    bow.classList.remove('pulling', 'drawn', 'firing', 'complete', 'interactive-ready');
     bow.style.removeProperty('--pull-distance');
     bow.style.removeProperty('--string-pull-distance');
-    photos.forEach(photo => photo.classList.remove('balloon-out', 'revealed', 'target-hit'));
+    bow.style.removeProperty('--aim-angle');
+    photos.forEach(photo => {
+      photo.classList.remove('balloon-out', 'revealed', 'target-hit');
+      photo.querySelector('.photo-target')?.classList.remove('target-aimed');
+    });
     setTease('Choose carefully, Bangaram. ✨');
-    if (bowHint) bowHint.textContent = 'Pull & release 🏹';
   };
 
   startPostQuizSurprise = resetSequence;
@@ -1135,109 +1231,66 @@ function initPostQuizSurprise() {
     triggerConfetti(1400);
     spawnHeartBurst(event.clientX || window.innerWidth / 2, event.clientY || window.innerHeight / 2, 28);
     photos.forEach((photo, index) => {
-      setTimeout(() => photo.classList.add('balloon-out'), 520 + index * 1120);
+      addTimer(() => photo.classList.add('balloon-out'), 520 + index * 1120);
     });
-    setTimeout(() => {
+    // Bow appears and aims at Photo 1, then WAITS for user click
+    addTimer(() => {
       sequence.classList.add('show-bow');
-      if (bowHint) bowHint.textContent = 'Pull the arrow, then release 🏹';
+      setReadyTarget(0);
     }, 3920);
   });
 
-  const revealNextPhoto = () => {
-    if (revealedPhotos >= photos.length) return;
-    const photo = photos[revealedPhotos];
-    photo.classList.add('revealed');
-    const rect = photo.getBoundingClientRect();
-    spawnHeartBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 20);
-    revealedPhotos += 1;
-    if (revealedPhotos < photos.length) {
-      if (bowHint) bowHint.textContent = `Beautiful! Aim for memory ${revealedPhotos + 1} 🏹`;
-    } else {
-      bow.classList.add('complete');
-      if (bowHint) bowHint.textContent = 'All three memories are yours ❤️';
-      setTimeout(() => sequence.classList.add('show-letter'), 720);
-    }
-  };
-
-  const launchArrowAt = (targetPhoto) => {
-    const bowRect = bow.getBoundingClientRect();
-    const targetRect = targetPhoto.getBoundingClientRect();
-    const startX = bowRect.left + bowRect.width * 0.58;
-    const startY = bowRect.top + bowRect.height * 0.38;
-    const targetX = targetRect.left + targetRect.width / 2;
-    const targetY = targetRect.top + targetRect.height / 2;
-    const travelX = targetX - startX;
-    const travelY = targetY - startY;
-    const angle = Math.atan2(travelY, travelX) * (180 / Math.PI);
-    const flyingArrow = document.createElement('div');
-
-    flyingArrow.className = 'flying-love-arrow';
-    flyingArrow.setAttribute('aria-hidden', 'true');
-    flyingArrow.style.left = `${startX}px`;
-    flyingArrow.style.top = `${startY}px`;
-    flyingArrow.style.transform = `rotate(${angle}deg)`;
-    document.body.appendChild(flyingArrow);
-
-    requestAnimationFrame(() => {
-      flyingArrow.style.transform = `translate(${travelX}px, ${travelY}px) rotate(${angle}deg)`;
-    });
-
-    setTimeout(() => {
-      flyingArrow.classList.add('impact');
-      targetPhoto.classList.add('target-hit');
-      const rect = targetPhoto.getBoundingClientRect();
-      spawnHeartBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 16);
-    }, 660);
-    setTimeout(() => flyingArrow.remove(), 940);
-  };
-
-  const releaseArrow = (event) => {
-    if (!pulling || shotInFlight) return;
-    pulling = false;
-    try { bow.releasePointerCapture(event.pointerId); } catch (_) { /* pointer already released */ }
-    bow.classList.remove('pulling');
-    if (pullAmount < 12) {
-      bow.style.removeProperty('--pull-distance');
-      bow.style.removeProperty('--string-pull-distance');
-      if (bowHint) bowHint.textContent = 'Pull it back a little, then release 🏹';
-      return;
-    }
-    bow.classList.add('firing');
-    shotInFlight = true;
-    bow.style.removeProperty('--pull-distance');
-    bow.style.removeProperty('--string-pull-distance');
-    setTimeout(() => bow.classList.remove('firing'), 700);
-    launchArrowAt(photos[revealedPhotos]);
-    setTimeout(() => {
-      revealNextPhoto();
-      shotInFlight = false;
-    }, 690);
-  };
-
+  // User click / pointer interaction on the bow
   bow.addEventListener('pointerdown', (event) => {
-    if (!giftOpened || revealedPhotos >= photos.length || shotInFlight) return;
+    if (isAnimating || shotInFlight || !giftOpened || revealedPhotos >= photos.length) return;
     pulling = true;
     pullStartX = event.clientX;
     pullAmount = 0;
-    bow.setPointerCapture(event.pointerId);
+    try { bow.setPointerCapture(event.pointerId); } catch (_) {}
     bow.classList.add('pulling');
     event.preventDefault();
   });
 
   bow.addEventListener('pointermove', (event) => {
     if (!pulling) return;
-    const distance = Math.max(0, Math.min(62, pullStartX - event.clientX));
+    const distance = Math.max(0, Math.min(65, pullStartX - event.clientX));
     pullAmount = distance;
     bow.style.setProperty('--pull-distance', `${distance}px`);
     bow.style.setProperty('--string-pull-distance', `${Math.round(distance * -0.45)}px`);
   });
-  bow.addEventListener('pointerup', releaseArrow);
-  bow.addEventListener('pointercancel', releaseArrow);
+
+  const onBowPointerUp = (event) => {
+    if (!pulling && !event.isTrusted) return;
+    if (isAnimating || shotInFlight) return;
+    pulling = false;
+    try { bow.releasePointerCapture(event.pointerId); } catch (_) {}
+    bow.classList.remove('pulling');
+    handleBowUserShot();
+  };
+
+  bow.addEventListener('pointerup', onBowPointerUp);
+  bow.addEventListener('pointercancel', () => {
+    pulling = false;
+    bow.classList.remove('pulling');
+  });
+
+  bow.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (!isAnimating && !shotInFlight && giftOpened && revealedPhotos < photos.length) {
+      handleBowUserShot();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (sequence.classList.contains('active') && sequence.classList.contains('show-bow') && revealedPhotos < photos.length && !shotInFlight) {
+      setReadyTarget(revealedPhotos);
+    }
+  });
 
   letterBtn.addEventListener('click', () => {
     if (revealedPhotos < photos.length) return;
     sequence.classList.add('letter-opening');
-    setTimeout(() => {
+    addTimer(() => {
       sequence.classList.remove('active');
       sequence.setAttribute('aria-hidden', 'true');
       document.dispatchEvent(new CustomEvent('open-surprise-letter'));
@@ -1550,4 +1603,134 @@ function initLoveLetterModal() {
   if (closeBtn) closeBtn.addEventListener('click', closeLetter);
   if (footerCloseBtn) footerCloseBtn.addEventListener('click', closeLetter);
   if (backdrop) backdrop.addEventListener('click', closeLetter);
+}
+
+/* ============================================================ */
+/*  FLOATING ROSE PETALS — DREAMY AMBIENT PARTICLE SYSTEM       */
+/* ============================================================ */
+
+function initFloatingPetals() {
+  const canvas = document.getElementById('petalsCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const petalColors = {
+    blush:       ['#ff85a1', '#ffb3c1', '#ffc6d3', '#ff9ebb', '#ffd6e0'],
+    velvet:      ['#d90429', '#ef233c', '#ffd166', '#ff4d6d', '#ffba08'],
+    starlight:   ['#c77dff', '#e0aaff', '#9d4edd', '#f368e0', '#b5e8ff'],
+    candlelight: ['#ffb703', '#fcbf49', '#f77f00', '#ffd166', '#ff8c42']
+  };
+
+  const petals = [];
+  const maxPetals = 35;
+
+  function createPetal() {
+    const colors = petalColors[currentTheme] || petalColors.blush;
+    return {
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 60,
+      size: Math.random() * 12 + 6,
+      speedY: Math.random() * 0.8 + 0.3,
+      speedX: (Math.random() - 0.5) * 0.6,
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 2,
+      wobble: Math.random() * Math.PI * 2,
+      wobbleSpeed: Math.random() * 0.02 + 0.01,
+      wobbleAmp: Math.random() * 1.5 + 0.5,
+      opacity: Math.random() * 0.5 + 0.3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      shape: Math.random() > 0.4 ? 'petal' : 'heart'
+    };
+  }
+
+  // Seed initial petals scattered across screen
+  for (let i = 0; i < maxPetals; i++) {
+    const p = createPetal();
+    p.y = Math.random() * canvas.height;
+    petals.push(p);
+  }
+
+  function drawPetal(p) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate((p.rotation * Math.PI) / 180);
+    ctx.globalAlpha = p.opacity;
+    ctx.fillStyle = p.color;
+
+    if (p.shape === 'heart') {
+      const s = p.size * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(0, s * 0.3);
+      ctx.bezierCurveTo(-s, -s * 0.5, -s * 0.4, -s * 1.2, 0, -s * 0.6);
+      ctx.bezierCurveTo(s * 0.4, -s * 1.2, s, -s * 0.5, 0, s * 0.3);
+      ctx.fill();
+    } else {
+      // Organic petal shape
+      ctx.beginPath();
+      ctx.ellipse(0, 0, p.size * 0.35, p.size, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Inner vein highlight
+      ctx.globalAlpha = p.opacity * 0.25;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, p.size * 0.08, p.size * 0.7, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Spawn new petals
+    if (petals.length < maxPetals && Math.random() < 0.12) {
+      petals.push(createPetal());
+    }
+
+    for (let i = petals.length - 1; i >= 0; i--) {
+      const p = petals[i];
+      p.wobble += p.wobbleSpeed;
+      p.x += p.speedX + Math.sin(p.wobble) * p.wobbleAmp;
+      p.y += p.speedY;
+      p.rotation += p.rotSpeed;
+
+      drawPetal(p);
+
+      // Recycle petals that fall off screen
+      if (p.y > canvas.height + 30 || p.x < -30 || p.x > canvas.width + 30) {
+        petals[i] = createPetal();
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+}
+
+/* ============================================================ */
+/*  AUTO-PLAY MUSIC ON FIRST USER INTERACTION                   */
+/* ============================================================ */
+
+function initAutoMusicOnInteraction() {
+  let triggered = false;
+  const handler = () => {
+    if (triggered) return;
+    triggered = true;
+    startMusic();
+    window.removeEventListener('click', handler);
+    window.removeEventListener('touchstart', handler);
+    window.removeEventListener('keydown', handler);
+  };
+  window.addEventListener('click', handler, { once: false });
+  window.addEventListener('touchstart', handler, { once: false });
+  window.addEventListener('keydown', handler, { once: false });
 }
