@@ -115,7 +115,7 @@ function runLegacyCardShuffleDeal() {
   document.body.appendChild(flight);
 
   const totalPhotos = photoPaths.length;
-  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.45 : 0.645);
+  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.39 : 0.275);
 
   photoPaths.forEach((item, index) => {
     const card = document.createElement('figure');
@@ -155,6 +155,10 @@ function runLegacyCardShuffleDeal() {
     // Phase 4 & 5 3D Orbit variables
     card.style.setProperty('--orbit-angle', `${angleDeg}deg`);
     card.style.setProperty('--orbit-radius', `${orbitRadius}px`);
+    card.style.setProperty('--ring-x', `${Math.cos(angleRad) * orbitRadius}px`);
+    card.style.setProperty('--ring-y', `${Math.sin(angleRad) * orbitRadius}px`);
+    card.style.setProperty('--ring-turn', `${Math.round(Math.sin(angleRad) * 8)}deg`);
+    card.style.setProperty('--ring-scale', (0.9 + ((Math.cos(angleRad) + 1) * 0.06)).toFixed(3));
     card.style.setProperty('--organize-radius', `${orbitRadius * 0.78}px`);
     card.style.setProperty('--depth-delay', `-${((1 - angleDeg / 360) * 38).toFixed(2)}s`);
 
@@ -228,7 +232,7 @@ function runCardShuffleDeal() {
   const flight = document.createElement('div');
   const sequenceRun = ++cardSequenceRun;
   const totalPhotos = photoPaths.length;
-  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.45 : 0.645);
+  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.39 : 0.275);
   const stackX = [-18, 14, -10, 21, -23, 8, 18, -15, 4, 24, -6];
   const stackY = [8, -4, 13, 2, -10, 16, -13, 5, -16, 11, -1];
   const stackTurn = [-9, 6, -5, 11, -12, 4, 9, -7, 2, 13, -3];
@@ -252,6 +256,7 @@ function runCardShuffleDeal() {
   photoPaths.forEach((src, index) => {
     const card = document.createElement('figure');
     const angleDeg = (360 / totalPhotos) * index + (180 / totalPhotos);
+    const angleRad = (angleDeg * Math.PI) / 180;
     card.className = 'flying-photo';
     card.style.setProperty('--photo-index', index);
     card.style.setProperty('--stack-x', `${stackX[index]}px`);
@@ -268,6 +273,10 @@ function runCardShuffleDeal() {
     card.style.setProperty('--shuffle-delay', `${index * 42}ms`);
     card.style.setProperty('--orbit-angle', `${angleDeg}deg`);
     card.style.setProperty('--orbit-radius', `${orbitRadius}px`);
+    card.style.setProperty('--ring-x', `${Math.cos(angleRad) * orbitRadius}px`);
+    card.style.setProperty('--ring-y', `${Math.sin(angleRad) * orbitRadius}px`);
+    card.style.setProperty('--ring-turn', `${Math.round(Math.sin(angleRad) * 8)}deg`);
+    card.style.setProperty('--ring-scale', (0.9 + ((Math.cos(angleRad) + 1) * 0.06)).toFixed(3));
     card.style.setProperty('--depth-delay', `-${((1 - angleDeg / 360) * 38).toFixed(2)}s`);
     card.innerHTML = `<img src="${src}" alt="Memory ${index + 1}"><figcaption>${index % 2 ? '✨ A little memory' : '❤️ Our moment'}</figcaption>`;
     track.appendChild(card);

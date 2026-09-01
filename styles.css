@@ -4092,6 +4092,10 @@ body.theme-blush, body { --bg: #14060f; --bg-deep: #090207; --gold: #e9a86f; --g
 
 .quiz-title { letter-spacing: .01em; }.quiz-emoji { filter: drop-shadow(0 0 13px rgba(255, 116, 174, .5)); }.quiz-card { background: linear-gradient(145deg, rgba(89, 14, 51, .94), rgba(29, 5, 21, .95)); }.quiz-btn-group .btn-choice { position: relative; overflow: hidden; }.quiz-btn-group .btn-choice::after { content: '✦'; position: absolute; top: 4px; right: 9px; color: rgba(255, 237, 191, .75); font-size: 11px; }.kids-options-grid .kid-opt-btn { background: linear-gradient(145deg, rgba(255, 165, 195, .14), rgba(111, 18, 59, .38)); }
 
-/* 75% larger carousel photos with a 25% wider track to preserve elegant separation. */
-.memory-flight .flying-photo { width: clamp(214px, 31.5vw, 340px); }
-@media (max-width: 620px) { .memory-flight .flying-photo { width: clamp(133px, 35vw, 172px); } }
+/* Clean circular banner: every memory has its own fixed, non-overlapping position. */
+.memory-flight .flying-photo { width: clamp(100px, 10.5vw, 116px); border-width: 4px; }
+.cards-organizing .flying-photo, .cards-settling .flying-photo { transform: translate(calc(-50% + var(--ring-x)), calc(-50% + var(--ring-y))) rotate(var(--ring-turn)) scale(var(--ring-scale)); }
+.roulette-track.orbit-mode { animation: cleanBannerRotate 46s linear infinite; transform-style: preserve-3d; }
+.roulette-track.orbit-mode .flying-photo { transform: translate(calc(-50% + var(--ring-x)), calc(-50% + var(--ring-y))) rotate(var(--ring-turn)) scale(var(--ring-scale)); animation: none; filter: brightness(1) saturate(1.03); opacity: 1; }
+@keyframes cleanBannerRotate { from { transform: rotateZ(0deg); } to { transform: rotateZ(360deg); } }
+@media (max-width: 620px) { .memory-flight .flying-photo { width: clamp(68px, 18.5vw, 78px); border-width: 3px; padding-bottom: 14px; }.memory-flight .flying-photo figcaption { bottom: -13px; font-size: 9px; }.banner-quiz-cta { top: calc(50% + 172px); } }
