@@ -4054,3 +4054,40 @@ body.theme-blush, body { --bg: #14060f; --bg-deep: #090207; --gold: #e9a86f; --g
 .cake-scene { transition: transform 1.15s cubic-bezier(.22,.8,.24,1), opacity 1s ease, filter 1s ease, left 1.15s cubic-bezier(.22,.8,.24,1), top 1.15s cubic-bezier(.22,.8,.24,1); }
 .birthday-opening.birthday-start .cake-scene { left: calc(100% - clamp(122px, 15vw, 236px)); top: 73%; transform: translate(-50%, -50%) scale(.58) rotate(3deg); filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.46)); }
 @media (max-width: 620px) { .birthday-opening.birthday-start .cake-scene { left: calc(100% - 76px); top: 78%; transform: translate(-50%, -50%) scale(.38) rotate(3deg); } .birthday-balloons span { width: min(var(--balloon-size), 44px); height: calc(min(var(--balloon-size), 44px) * 1.2); } }
+
+/* Mobile-first safeguards for narrow phones, tall phones, and safe-area screens. */
+@media (max-width: 480px) {
+  html { -webkit-text-size-adjust: 100%; }
+  .top-bar { position: fixed; min-height: 52px; padding: calc(7px + env(safe-area-inset-top)) 6px 7px; }
+  .gallery-toggle-btn-wrapper { width: 100%; display: flex; justify-content: center; gap: 5px; }
+  .action-pill-btn { min-height: 36px; padding: 8px 9px; font-size: 10px; white-space: nowrap; }
+  .birthday-opening, .photo-shuffle-scene { min-height: 100dvh; }
+  .birthday-reveal { width: min(88vw, 360px); transform-origin: center; }
+  .opening-kicker { max-width: 260px; margin-inline: auto; font-size: 9px; letter-spacing: .2em; }
+  .opening-love { max-width: 230px; margin: 18px auto 0; font-size: 15px; line-height: 1.35; }
+  .party-popper { font-size: 40px; top: 34%; }.popper-left { left: 2px; }.popper-right { right: 2px; }
+  .birthday-balloons span:nth-child(2n) { display: none; }
+  .quiz-modal-overlay { align-items: center; padding: 12px; }
+  .quiz-card { max-height: calc(100dvh - 24px); overflow-y: auto; border-radius: 22px; padding: 25px 16px 20px; }
+  .quiz-close { top: 10px; right: 10px; width: 38px; height: 38px; }
+  .quiz-progress-bar { gap: 7px; margin-bottom: 17px; }.quiz-step-dot { width: 27px; height: 27px; font-size: 12px; }.quiz-step-line { width: 28px; }
+  .quiz-emoji { font-size: 42px; margin-bottom: 7px; }.quiz-title { padding-inline: 26px; font-size: 23px; line-height: 1.13; }.quiz-subtitle { margin-bottom: 20px; font-size: 14px; line-height: 1.45; }
+  .quiz-btn-group { gap: 10px; min-height: 56px; }.btn-choice { min-width: 118px; min-height: 48px; padding: 12px 18px; font-size: 15px; }
+  .kids-options-grid { gap: 10px; }.kid-opt-btn { min-height: 64px; padding: 12px 8px; border-radius: 14px; font-size: 13px; }
+  .banner-quiz-cta { top: calc(50% + 155px); }.banner-hint { font-size: 11px; }
+  .birthday-message-scene { margin: 64px auto 45px; padding-inline: 12px; }.message-card-wrapper { border-radius: 22px; padding: 27px 18px; }.title-glow { font-size: clamp(29px, 9vw, 42px); }.romantic-body { font-size: 17px; line-height: 1.55; }.love-stanzas-grid { grid-template-columns: 1fr; gap: 13px; }.stanza-card { padding: 18px; }
+  .surprise-panel, .surprise-gift-stage { width: min(94vw, 390px); }.surprise-panel { padding: 28px 17px; }.surprise-gate h2 { font-size: clamp(31px, 10vw, 42px); }.surprise-choices { gap: 8px; }.surprise-choice { min-width: 118px; min-height: 52px; }.surprise-gift-stage { top: 51%; }.surprise-photo { width: 96px; }.photo-one { --photo-x: -96px; --photo-y: -155px; }.photo-two { --photo-x: 0px; --photo-y: -203px; }.photo-three { --photo-x: 96px; --photo-y: -150px; }.surprise-bow { bottom: calc(8px + env(safe-area-inset-bottom)); }.surprise-letter-invite { bottom: calc(12px + env(safe-area-inset-bottom)); padding: 14px; }
+  .vintage-table-modal-overlay { align-items: flex-start; padding: calc(12px + env(safe-area-inset-top)) 10px calc(20px + env(safe-area-inset-bottom)); }.vintage-table-stage { width: 100%; padding: 38px 0 12px; }.physical-letter-wrapper { margin: 0 auto; }.vintage-ivory-sheet { width: 100%; border-radius: 18px; padding: 24px 15px 27px; }.table-rose-container { display: none; }.table-scene-close { top: calc(10px + env(safe-area-inset-top)); right: 12px; width: 40px; height: 40px; }.calligraphy-opening-title { font-size: clamp(37px, 13vw, 50px); }.calligraphy-opening-subtitle { font-size: 17px; }.vintage-letter-text-flow { font-size: 16px; line-height: 1.65; }.vintage-letter-stanza { margin-bottom: 17px; }.vintage-letter-quote-card, .vintage-promise-box { padding: 16px 13px; }.vintage-table-toolbar { width: 100%; gap: 8px; margin-top: 14px; }.table-action-pill-btn { min-height: 42px; padding: 10px 13px; font-size: 12px; }
+}
+
+@media (max-width: 350px) { .action-pill-btn { padding-inline: 6px; font-size: 9px; }.surprise-choice { min-width: 108px; }.btn-choice { min-width: 106px; padding-inline: 13px; }.birthday-opening.birthday-start .cake-scene { left: calc(100% - 59px); transform: translate(-50%, -50%) scale(.31) rotate(3deg); }.photo-one { --photo-x: -82px; }.photo-three { --photo-x: 82px; } }
+
+/* A smaller mobile orbit plus slimmer cards creates clear breathing room between memories. */
+@media (max-width: 620px) {
+  .memory-flight .flying-photo { width: clamp(76px, 20vw, 98px); border-width: 4px; padding-bottom: 17px; box-shadow: 0 13px 25px rgba(0,0,0,.45); }
+  .memory-flight .flying-photo figcaption { bottom: -15px; font-size: 10px; }
+  .roulette-track.orbit-mode .flying-photo { box-shadow: 0 12px 24px rgba(0,0,0,.43); }
+  .cards-organizing .flying-photo, .cards-settling .flying-photo { filter: brightness(1.02) saturate(1.04); }
+}
+
+.quiz-title { letter-spacing: .01em; }.quiz-emoji { filter: drop-shadow(0 0 13px rgba(255, 116, 174, .5)); }.quiz-card { background: linear-gradient(145deg, rgba(89, 14, 51, .94), rgba(29, 5, 21, .95)); }.quiz-btn-group .btn-choice { position: relative; overflow: hidden; }.quiz-btn-group .btn-choice::after { content: '✦'; position: absolute; top: 4px; right: 9px; color: rgba(255, 237, 191, .75); font-size: 11px; }.kids-options-grid .kid-opt-btn { background: linear-gradient(145deg, rgba(255, 165, 195, .14), rgba(111, 18, 59, .38)); }

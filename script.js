@@ -115,7 +115,7 @@ function runLegacyCardShuffleDeal() {
   document.body.appendChild(flight);
 
   const totalPhotos = photoPaths.length;
-  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.42 : 0.516);
+  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.36 : 0.516);
 
   photoPaths.forEach((item, index) => {
     const card = document.createElement('figure');
@@ -228,7 +228,7 @@ function runCardShuffleDeal() {
   const flight = document.createElement('div');
   const sequenceRun = ++cardSequenceRun;
   const totalPhotos = photoPaths.length;
-  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.42 : 0.516);
+  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.36 : 0.516);
   const stackX = [-18, 14, -10, 21, -23, 8, 18, -15, 4, 24, -6];
   const stackY = [8, -4, 13, 2, -10, 16, -13, 5, -16, 11, -1];
   const stackTurn = [-9, 6, -5, 11, -12, 4, 9, -7, 2, 13, -3];
@@ -821,8 +821,8 @@ function initMultiStepQuiz() {
       q1NoBtn.style.left = '';
       q1NoBtn.style.top = '';
     }
-    if (quizEmoji1) quizEmoji1.textContent = '🥰';
-    if (quizSub1) quizSub1.textContent = 'Answer honestly, Bangaram!';
+    if (quizEmoji1) quizEmoji1.textContent = '🥰💘';
+    if (quizSub1) quizSub1.textContent = 'Be honest… my heart is listening 👀💗';
 
     if (quizBtnGroup2) quizBtnGroup2.classList.remove('hide-buttons');
     if (q2YesBtn) {
@@ -837,8 +837,8 @@ function initMultiStepQuiz() {
       q2NoBtn.style.left = '';
       q2NoBtn.style.top = '';
     }
-    if (quizEmoji2) quizEmoji2.textContent = '💍';
-    if (quizSub2) quizSub2.textContent = 'The most important question of my life… 💖';
+    if (quizEmoji2) quizEmoji2.textContent = '💍🥹';
+    if (quizSub2) quizSub2.textContent = 'Say yes… I have a forever planned with you ♾️😘';
     document.body.style.background = '';
   };
 
@@ -875,8 +875,8 @@ function initMultiStepQuiz() {
       q1Answered = true;
 
       spawnHeartBurst(e.clientX, e.clientY, 30);
-      quizEmoji1.textContent = '🥰';
-      quizSub1.textContent = 'I knew it! You love me the most! ❤️';
+      quizEmoji1.textContent = '🥰💘';
+      quizSub1.textContent = 'I knew it! You love me the most! 💘😘';
 
       // 5-second Confetti effect
       triggerConfetti(5000);
@@ -935,8 +935,8 @@ function initMultiStepQuiz() {
       q2Answered = true;
 
       spawnHeartBurst(e.clientX, e.clientY, 35);
-      quizEmoji2.textContent = '💍';
-      quizSub2.textContent = 'Forever & Always, in this life and all to come! ♾️❤️';
+      quizEmoji2.textContent = '💍🥹';
+      quizSub2.textContent = 'Forever & always… in this life and all to come! ♾️❤️😘';
 
       // 5-second Confetti effect
       triggerConfetti(5000);
