@@ -4091,3 +4091,7 @@ body.theme-blush, body { --bg: #14060f; --bg-deep: #090207; --gold: #e9a86f; --g
 }
 
 .quiz-title { letter-spacing: .01em; }.quiz-emoji { filter: drop-shadow(0 0 13px rgba(255, 116, 174, .5)); }.quiz-card { background: linear-gradient(145deg, rgba(89, 14, 51, .94), rgba(29, 5, 21, .95)); }.quiz-btn-group .btn-choice { position: relative; overflow: hidden; }.quiz-btn-group .btn-choice::after { content: '✦'; position: absolute; top: 4px; right: 9px; color: rgba(255, 237, 191, .75); font-size: 11px; }.kids-options-grid .kid-opt-btn { background: linear-gradient(145deg, rgba(255, 165, 195, .14), rgba(111, 18, 59, .38)); }
+
+/* 75% larger carousel photos with a 25% wider track to preserve elegant separation. */
+.memory-flight .flying-photo { width: clamp(214px, 31.5vw, 340px); }
+@media (max-width: 620px) { .memory-flight .flying-photo { width: clamp(133px, 35vw, 172px); } }

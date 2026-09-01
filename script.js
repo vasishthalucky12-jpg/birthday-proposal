@@ -115,7 +115,7 @@ function runLegacyCardShuffleDeal() {
   document.body.appendChild(flight);
 
   const totalPhotos = photoPaths.length;
-  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.36 : 0.516);
+  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.45 : 0.645);
 
   photoPaths.forEach((item, index) => {
     const card = document.createElement('figure');
@@ -228,7 +228,7 @@ function runCardShuffleDeal() {
   const flight = document.createElement('div');
   const sequenceRun = ++cardSequenceRun;
   const totalPhotos = photoPaths.length;
-  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.36 : 0.516);
+  const orbitRadius = Math.min(window.innerWidth, 980) * (window.innerWidth < 620 ? 0.45 : 0.645);
   const stackX = [-18, 14, -10, 21, -23, 8, 18, -15, 4, 24, -6];
   const stackY = [8, -4, 13, 2, -10, 16, -13, 5, -16, 11, -1];
   const stackTurn = [-9, 6, -5, 11, -12, 4, 9, -7, 2, 13, -3];
